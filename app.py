@@ -1,4 +1,4 @@
-from flask import Flask, request, url_for
+from flask import Flask, render_template, request, url_for
 from markupsafe import escape
 
 app = Flask(__name__)
@@ -13,7 +13,15 @@ def about() -> str:
 
 @app.route('/user/<username>')
 def profile(username: str) -> str:
-    return f'{username} 님의 프로필'
+    return render_template(
+        'profile.html', username=username, posts=['첫 글', '두 번째 글']
+    )
+
+
+@app.route('/newuser/<username>')
+def new_user(username: str) -> str:
+    posts: list[str] = []
+    return render_template('profile.html', username=username, posts=posts)
 
 @app.route('/post/<int:pid>')
 def post(pid: int) -> str:
