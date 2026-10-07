@@ -1,16 +1,23 @@
+from typing import TypedDict
+
 from flask import Flask, redirect, render_template, request, url_for
 from werkzeug.wrappers import Response
 
 app = Flask(__name__)
 
-todos: list[str] = []
+class Todo(TypedDict):
+    text: str
+    done: bool
+
+
+todos: list[Todo] = []
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index() -> str | Response:
     if request.method == 'POST':
         todo = request.form['todo']
-        todos.append(todo)
+        todos.append({'text': todo, 'done': False})
         return redirect(url_for('index'))
     return render_template('index.html', todos=todos)
 
@@ -19,6 +26,13 @@ def index() -> str | Response:
 def delete(index: int) -> Response:
     if 0 <= index < len(todos):
         del todos[index]
+    return redirect(url_for('index'))
+
+
+@app.route('/toggle/<int:index>')
+def toggle(index: int) -> Response:
+    if 0 <= index < len(todos):
+        todos[index]['done'] = not todos[index]['done']
     return redirect(url_for('index'))
 
 
